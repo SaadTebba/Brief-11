@@ -65,3 +65,8 @@ function getMealsList() {
         })
     document.getElementById('searchbar').value = "";
 }
+
+
+// https://www.youtube.com/watch?v=IqYiVHrO2U8 ===== Pagination
+
+// https://www.youtube.com/watch?v=opikz5x_1ak ===== TheMealDB API project example

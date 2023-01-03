@@ -5,7 +5,6 @@ for (i = 0; i < 6; i++) {
     fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             let meals = "";
 
             if (data.meals) {

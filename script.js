@@ -12,6 +12,7 @@ for (i = 0; i < 6; i++) {
           meals += `
                         <div class="col-sm-3 d-inline-block m-5">
                             <div class="card">
+                                <p>${meal.idMeal}</p>
                                 <div class="card-body">
                                     <h5 class="card-title">${meal.strMeal}</h5>
                                 </div>
@@ -49,7 +50,7 @@ function getMealsList() {
                                 </div>
                                 <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
                                 <div class="card-body">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                                    <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
                                 </div>
                             </div>
                         </div>
@@ -61,59 +62,43 @@ function getMealsList() {
     });
 }
 
-// ==================================== Filling modal window with information ====================================
-
-let moreInformation = document.getElementById('moreInformation');
-moreInformation.addEventListener('click', moreInformationFunction)
-
-function moreInformationFunction(e) {
-  e.preventDefault();
-  console.log(e.target);
-  console.log("test working");
-//   if (e.target.classList.contains("more-information")) {
-//     let mealItem = e.target.parentElement.parentElement;
-//     console.log(mealItem);
-//     fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=52772`)
-//       .then((response) => response.json())
-//       .then((data) => {
-//         // console.log(data)
-//         let modalwindowbody = document.getElementById("modalwindowbody");
-//         for (i = 0; i < data.meals.length; i++) {
-//           modalwindowbody.innerHTML += `
-//             <p><b>Meal name:</b> ${data.meals[i].strMeal}</p>
-//             <p><b>Meal category:</b> ${data.meals[i].strCategory}</p>
-//             <p><b>Meal area:</b> ${data.meals[i].strArea}</p>
-//             <p><b>Meal instructions:</b> ${data.meals[i].strInstructions}</p>
-//             <p><b>Youtube link:</b> ${data.meals[i].strYoutube}</p>
-//       `;
-//         }
-//       });
-//   }
-}
 
 // ==================================== Filter by categories ====================================
 
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
-  .then((response) => response.json())
+.then((response) => response.json())
   .then((data) => {
-    let categorieslist = document.getElementById("categorieslist");
-    categorieslist.innerHTML = `<option selected>${data.meals[5].strCategory}</option>`;
-    for (i = 0; i < data.meals.length; i++) {
+      let categorieslist = document.getElementById("categorieslist");
+      categorieslist.innerHTML = `<option selected>${data.meals[5].strCategory}</option>`;
+      for (i = 0; i < data.meals.length; i++) {
       categorieslist.innerHTML += `<option>${data.meals[i].strCategory}</option> `;
     }
-  });
+});
 
 // ==================================== Filter by areas ====================================
 
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
-  .then((response) => response.json())
-  .then((data) => {
+.then((response) => response.json())
+.then((data) => {
     let arealist = document.getElementById("arealist");
     arealist.innerHTML = `<option selected>${data.meals[17].strArea}</option>`;
     for (i = 0; i < data.meals.length; i++) {
-      arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
+        arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
     }
-  });
+});
+
+// ==================================== Filling modal window with information ====================================
+
+let moreInformation = document.getElementById('moreInformation');
+
+window.onclick = function moreInformation(e) {
+  if(e.target.classList.contains('more-information')) {
+    let mealItem = e.target.parentElement.parentElement;
+    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=52966`)
+    .then(response => response.json())
+    .then(data => console.log(data))
+  }
+}
 
 // ==================================== Pagination for max 6 meals in each page ====================================
 

@@ -1,12 +1,12 @@
 .input-group {
     padding: 4%;
 }
-.row {
-    margin: 2%;
-}
-#switchPageButton {
+#switchPageButton, #backToMainPage {
     margin-top: 1%;
 }
 .text-center {
     margin-bottom: 1%;
+}
+#categorieslist, #arealist {
+    margin: 1%;
 }

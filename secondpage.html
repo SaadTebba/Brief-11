@@ -15,13 +15,36 @@
 
     <div class="container">
 
-        <select class="form-select" aria-label="Default select example" id="categorieslist">
+        <a href="/index.html" class="btn btn-primary" id="backToMainPage">Back to main page</a>
+
+        <select class="form-select col-6" aria-label="Default select example" id="categorieslist"
+            onchange="selectedOptionCategory()">
         </select>
 
-        <select class="form-select" aria-label="Default select example" id="arealist">
+        <select class="form-select col-6" aria-label="Default select example" id="arealist"
+            onchange="selectedOptionArea()">
         </select>
-        
-        <a href="/index.html" class="btn btn-primary">Back to the first page</a>
+
+        <!-- ============================== Modal window ============================== -->
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">More informations about the meal</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalwindowbody">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mealsOutputSecondPage"></div>
 
     </div>
 

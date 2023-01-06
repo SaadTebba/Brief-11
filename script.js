@@ -11,8 +11,7 @@ for (i = 0; i < 6; i++) {
         data.meals.forEach((meal) => {
           meals += `
                         <div class="col-sm-3 d-inline-block m-5">
-                            <div class="card">
-                                <p>${meal.idMeal}</p>
+                            <div class="card" data-id = "${meal.idMeal}">
                                 <div class="card-body">
                                     <h5 class="card-title">${meal.strMeal}</h5>
                                 </div>
@@ -44,7 +43,7 @@ function getMealsList() {
         data.meals.forEach((meal) => {
           meals += `
                         <div class="col-sm-3 d-inline-block m-5">
-                            <div class="card">
+                            <div class="card" data-id = "${meal.idMeal}">
                                 <div class="card-body">
                                     <h5 class="card-title">${meal.strMeal}</h5>
                                 </div>
@@ -62,43 +61,69 @@ function getMealsList() {
     });
 }
 
-
 // ==================================== Filter by categories ====================================
 
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
-.then((response) => response.json())
+  .then((response) => response.json())
   .then((data) => {
-      let categorieslist = document.getElementById("categorieslist");
-      categorieslist.innerHTML = `<option selected>${data.meals[5].strCategory}</option>`;
-      for (i = 0; i < data.meals.length; i++) {
+    let categorieslist = document.getElementById("categorieslist");
+    categorieslist.innerHTML = `<option selected>${data.meals[5].strCategory}</option>`;
+    for (i = 0; i < data.meals.length; i++) {
       categorieslist.innerHTML += `<option>${data.meals[i].strCategory}</option> `;
     }
-});
+  });
 
 // ==================================== Filter by areas ====================================
 
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
-.then((response) => response.json())
-.then((data) => {
+  .then((response) => response.json())
+  .then((data) => {
     let arealist = document.getElementById("arealist");
     arealist.innerHTML = `<option selected>${data.meals[17].strArea}</option>`;
     for (i = 0; i < data.meals.length; i++) {
-        arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
+      arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
     }
-});
+  });
 
-// ==================================== Filling modal window with information ====================================
+// ==================================== Modal window - Onclick: more information ====================================
 
-let moreInformation = document.getElementById('moreInformation');
+let moreInformation = document.getElementById("moreInformation");
 
 window.onclick = function moreInformation(e) {
-  if(e.target.classList.contains('more-information')) {
+  if (e.target.classList.contains("more-information")) {
+
     let mealItem = e.target.parentElement.parentElement;
-    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=52966`)
-    .then(response => response.json())
-    .then(data => console.log(data))
+
+    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealItem.dataset.id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        let modalWindow = "";
+        modalWindow = 
+        `
+        <p><b>Meal name: </b>${data.meals[0].strMeal}</p>
+        <img src="${data.meals[0].strMealThumb}" alt="recipe image" style="width: 75%;">
+        <p><b>Meal category: </b>${data.meals[0].strCategory}</p>
+        <p><b>Meal area: </b>${data.meals[0].strArea}</p>
+        <p><b>Meal ingredients: </b></p><ul>
+        `
+
+        // for (j = 0; j < 20; j++) {
+        //   if (data.meals[0].strIngredient[j] != "") {
+            modalWindow += `<li>${data.meals[0].strIngredient1}</li>`
+        //   }
+        // }
+
+        modalWindow += 
+        `
+        </ul><p><b>Meal instructions: </b>${data.meals[0].strInstructions}</p>
+        <p><b>YouTube Link: </b><a href="${data.meals[0].strYoutube}" target="_blank">${data.meals[0].strYoutube}</a></p>
+        `
+        let modalWindowOutput = document.getElementById('modalwindowbody')
+        modalWindowOutput.innerHTML = modalWindow;
+      });
   }
-}
+};
 
 // ==================================== Pagination for max 6 meals in each page ====================================
 

@@ -432,12 +432,13 @@ function filterBoth() {
       fetchArea
         .then((response) => response.json())
         .then((secondData) => {
-            
+
           console.log(firstData);
           console.log(secondData);
 
           for (i = 0; i < firstData.meals.length; i++) {
             let firstArray = firstData.meals[i].idMeal;
+            console.log(firstArray);
             console.log(firstArray);
           }
 

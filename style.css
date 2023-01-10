@@ -10,3 +10,7 @@
 #categorieslist, #arealist {
     margin: 1%;
 }
+.pagination-buttons {
+    margin-top: 1.5%;
+    margin-right: 0.4%;
+}

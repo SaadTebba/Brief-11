@@ -64,15 +64,15 @@ fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
 
 // ==================================== Filter by Lamb ====================================
 
+let filterByLambArray = [];
+
 fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Lamb`)
   .then((response) => response.json())
   .then((data) => {
     let meals = "";
 
-    if (data.meals) {
-      data.meals.forEach((meal) => {
-        meals += `
-            <div class="col-sm-3 d-inline-block m-3">
+    data.meals.forEach((meal) => {
+      meals = `
                 <div class="card" data-id = "${meal.idMeal}">
                     <div class="card-body">
                         <h5 class="card-title">${meal.strMeal}</h5>
@@ -82,10 +82,88 @@ fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Lamb`)
                         <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
                     </div>
                 </div>
-            </div>
             `;
-      });
       mealsOutputSecondPage.innerHTML = meals;
+      filterByLambArray.push(meals);
+    });
+    if (filterByLambArray.length > 6) {
+      let list_items = filterByLambArray;
+
+      let pagination_element = document.getElementById("paginationSecondPage");
+
+      let current_page = 1;
+      let cards = 6;
+
+      function DisplayList(items, wrapper, rows_per_page, page) {
+        wrapper.innerHTML = "";
+        page--;
+
+        let start = rows_per_page * page;
+        let end = start + rows_per_page;
+        let paginatedItems = items.slice(start, end);
+
+        for (let i = 0; i < paginatedItems.length; i++) {
+          let item = paginatedItems[i];
+
+          let item_element = document.createElement("div");
+          item_element.classList.add("item");
+          item_element.classList.add("col-sm-3");
+          item_element.classList.add("d-inline-block");
+          item_element.classList.add("m-3");
+          item_element.innerHTML = item;
+
+          wrapper.appendChild(item_element);
+        }
+      }
+
+      function SetupPagination(items, wrapper, rows_per_page) {
+        wrapper.innerHTML = "";
+
+        let page_count = Math.ceil(items.length / rows_per_page);
+        for (let i = 1; i < page_count + 1; i++) {
+          let btn = PaginationButton(i, items);
+          wrapper.appendChild(btn);
+        }
+      }
+
+      function PaginationButton(page) {
+        let button = document.createElement("button");
+        button.classList.add("btn");
+        button.classList.add("btn-outline-primary");
+        button.classList.add("pagination-buttons");
+        button.innerText = page;
+
+        if (current_page == page) button.classList.add("active");
+
+        button.addEventListener("click", function () {
+          current_page = page;
+          DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
+          let current_btn = document.querySelector("button.active");
+          current_btn.classList.remove("active");
+          button.classList.add("active");
+        });
+
+        return button;
+      }
+
+      DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
+      SetupPagination(list_items, pagination_element, cards);
+    } else {
+      let pagination_element = document.getElementById("paginationSecondPage");
+      let mealsOutputSecondPage = document.getElementById(
+        "mealsOutputSecondPage"
+      );
+      mealsOutputSecondPage.innerHTML = "";
+      pagination_element.innerHTML = "";
+
+      let parentDiv = document.createElement("div");
+      parentDiv.classList.add("col-sm-3");
+      parentDiv.classList.add("d-inline-block");
+      parentDiv.classList.add("m-3");
+
+      let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
+
+      appendingParentDiv.innerHTML = meals;
     }
   });
 
@@ -166,7 +244,7 @@ function selectedOptionCategory() {
         function PaginationButton(page) {
           let button = document.createElement("button");
           button.classList.add("btn");
-          button.classList.add("btn-primary");
+          button.classList.add("btn-outline-primary");
           button.classList.add("pagination-buttons");
           button.innerText = page;
 
@@ -284,7 +362,7 @@ function selectedOptionArea() {
         function PaginationButton(page) {
           let button = document.createElement("button");
           button.classList.add("btn");
-          button.classList.add("btn-primary");
+          button.classList.add("btn-outline-primary");
           button.classList.add("pagination-buttons");
           button.innerText = page;
 
@@ -350,51 +428,63 @@ function filterBoth() {
 
   fetchCategory
     .then((response) => response.json())
-    .then((data) => {
-      filterBothArray.push(data);
-      // let meals = "";
+    .then((firstData) => {
+      fetchArea
+        .then((response) => response.json())
+        .then((secondData) => {
+            
+          console.log(firstData);
+          console.log(secondData);
 
-      // data.meals.forEach((meal) => {
-      //   meals += `
-      //                 <div class="col-sm-3 d-inline-block m-3">
-      //                     <div class="card" data-id = "${meal.idMeal}">
-      //                         <div class="card-body">
-      //                             <h5 class="card-title">${meal.strMeal}</h5>
-      //                         </div>
-      //                         <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
-      //                         <div class="card-body">
-      //                             <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
-      //                         </div>
-      //                     </div>
-      //                 </div>
-      //                 `;
-      // });
-      // mealsOutputSecondPage.innerHTML = meals;
+          for (i = 0; i < firstData.meals.length; i++) {
+            let firstArray = firstData.meals[i].idMeal;
+            console.log(firstArray);
+          }
+
+          for (j = 0; j < secondData.meals.length; j++) {
+            let secondArray = secondData.meals[j].idMeal;
+            console.log(secondArray);
+          }
+
+          //   console.log(firstData.meals.length);
+          //   console.log(secondData);
+
+          //   var array1 = new Array("a","b","c","d","e","f");
+          //   var array2 = new Array("c","e");
+
+          //   for (var i = 0; i<array2.length; i++) {
+          //       for (var j = 0; j<array1.length; j++) {
+          //           if (array2[i] == array1[j]) {
+          //               array1 = array1.slice(0, j).concat(array1.slice(j+1, array1.length));
+          //           }
+          //       }
+          //   }
+
+          //   console.log(array1)
+
+          //   for (i = 0; i < firstData.meals.length; i++) {
+          //     console.log(firstData.meals[i].idMeal);
+
+          //     let firstArray = firstData.meals[i].idMeal;
+          //     let secondArray = secondData.meals[i].idMeal;
+
+          //     array1 = array1.filter(function(val) {
+          //         return array2.indexOf(val) == -1;
+          //       });
+
+          //     firstArray = firstArray.filter((val) => !secondArray.includes(val));
+          //     console.log(firstArray);
+          //   }
+        });
     });
-
-  fetchArea
-    .then((response) => response.json())
-    .then((data) => {
-      filterBothArray.push(data);
-      // let meals = "";
-
-      // data.meals.forEach((meal) => {
-      //   meals += `
-      //               <div class="col-sm-3 d-inline-block m-3">
-      //                   <div class="card" data-id = "${meal.idMeal}">
-      //                       <div class="card-body">
-      //                           <h5 class="card-title">${meal.strMeal}</h5>
-      //                       </div>
-      //                       <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
-      //                       <div class="card-body">
-      //                           <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
-      //                       </div>
-      //                   </div>
-      //               </div>
-      //               `;
-      // });
-      // mealsOutputSecondPage.innerHTML = meals;
-    });
-
-  console.log(filterBothArray);
 }
+
+// let newContact = array1.filter((item) => item.id !== array2.id);
+
+// let myArrayTest = ['hello','goodbye','hey', 'hello'];
+
+// function hasDuplicates(array) {
+//     return (new Set(array)).size !== array.length;
+// }
+
+// console.log(hasDuplicates(myArrayTest));

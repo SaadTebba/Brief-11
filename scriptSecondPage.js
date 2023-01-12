@@ -44,7 +44,7 @@ fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
   .then((response) => response.json())
   .then((data) => {
     let categorieslist = document.getElementById("categorieslist");
-    categorieslist.innerHTML = `<option selected>${data.meals[5].strCategory}</option>`;
+    categorieslist.innerHTML = `<option selected hidden>${data.meals[5].strCategory}</option>`;
     for (i = 0; i < data.meals.length; i++) {
       categorieslist.innerHTML += `<option>${data.meals[i].strCategory}</option>`;
     }
@@ -56,7 +56,7 @@ fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
   .then((response) => response.json())
   .then((data) => {
     let arealist = document.getElementById("arealist");
-    arealist.innerHTML = `<option selected>${data.meals[17].strArea}</option>`;
+    arealist.innerHTML = `<option selected hidden>${data.meals[17].strArea}</option>`;
     for (i = 0; i < data.meals.length; i++) {
       arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
     }
@@ -83,7 +83,6 @@ fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Lamb`)
                     </div>
                 </div>
             `;
-      mealsOutputSecondPage.innerHTML = meals;
       filterByLambArray.push(meals);
     });
     if (filterByLambArray.length > 6) {
@@ -197,7 +196,6 @@ function selectedOptionCategory() {
                         </div>
                     `;
         categoryPaginationArray.push(meals);
-        mealsOutputSecondPage.innerHTML = meals;
       });
       if (categoryPaginationArray.length > 6) {
         let list_items = categoryPaginationArray;
@@ -314,7 +312,6 @@ function selectedOptionArea() {
                             </div>
                         </div>
                     `;
-        mealsOutputSecondPage.innerHTML = meals;
         areaPaginationArray.push(meals);
       });
       if (areaPaginationArray.length > 6) {
@@ -406,9 +403,12 @@ function selectedOptionArea() {
 // ==================================== Filter by both category and area ====================================
 
 let filterBothArray = [];
+let ifConditionArray = [];
 
 function filterBoth() {
+  
   filterBothArray = [];
+  ifConditionArray = [];
 
   let categorieslist = document.getElementById("categorieslist");
   let j = categorieslist.selectedIndex;
@@ -432,60 +432,139 @@ function filterBoth() {
       fetchArea
         .then((response) => response.json())
         .then((secondData) => {
-
-          console.log(firstData);
-          console.log(secondData);
-
           for (i = 0; i < firstData.meals.length; i++) {
-            let firstArray = firstData.meals[i].idMeal;
-            console.log(firstArray);
-            console.log(firstArray);
+            let firstArray = firstData.meals[i];
+            for (j = 0; j < secondData.meals.length; j++) {
+              let secondArray = secondData.meals[j];
+
+              if (firstArray.idMeal == secondArray.idMeal) {
+                ifConditionArray.push("if worked");
+                let meals = "";
+
+                meals = `
+                            <div class="card" data-id = "${firstArray.idMeal}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${firstArray.strMeal}</h5>
+                                </div>
+                                <img class="card-img-top" src="${firstArray.strMealThumb}" alt="Recipe image">
+                                <div class="card-body">
+                                    <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                                </div>
+                            </div>
+                        `;
+                filterBothArray.push(meals);
+
+                if (filterBothArray.length > 6) {
+
+                  let list_items = filterBothArray;
+
+                  let pagination_element = document.getElementById(
+                    "paginationSecondPage"
+                  );
+
+                  let current_page = 1;
+                  let cards = 6;
+
+                  function DisplayList(items, wrapper, rows_per_page, page) {
+                    wrapper.innerHTML = "";
+                    page--;
+
+                    let start = rows_per_page * page;
+                    let end = start + rows_per_page;
+                    let paginatedItems = items.slice(start, end);
+
+                    for (let i = 0; i < paginatedItems.length; i++) {
+                      let item = paginatedItems[i];
+
+                      let item_element = document.createElement("div");
+                      // item_element.classList.add("item");
+                      item_element.classList.add("col-sm-3");
+                      item_element.classList.add("d-inline-block");
+                      item_element.classList.add("m-3");
+                      item_element.innerHTML = item;
+
+                      wrapper.appendChild(item_element);
+                    }
+                  }
+
+                  function SetupPagination(items, wrapper, rows_per_page) {
+                    wrapper.innerHTML = "";
+
+                    let page_count = Math.ceil(items.length / rows_per_page);
+                    for (let i = 1; i < page_count + 1; i++) {
+                      let btn = PaginationButton(i, items);
+                      wrapper.appendChild(btn);
+                    }
+                  }
+
+                  function PaginationButton(page) {
+                    let button = document.createElement("button");
+                    button.classList.add("btn");
+                    button.classList.add("btn-outline-primary");
+                    button.classList.add("pagination-buttons");
+                    button.innerText = page;
+
+                    if (current_page == page) button.classList.add("active");
+
+                    button.addEventListener("click", function () {
+                      current_page = page;
+                      DisplayList(
+                        list_items,
+                        mealsOutputSecondPage,
+                        cards,
+                        current_page
+                      );
+                      let current_btn = document.querySelector("button.active");
+                      current_btn.classList.remove("active");
+                      button.classList.add("active");
+                    });
+
+                    return button;
+                  }
+
+                  DisplayList(
+                    list_items,
+                    mealsOutputSecondPage,
+                    cards,
+                    current_page
+                  );
+                  SetupPagination(list_items, pagination_element, cards);
+                } else {
+                  let pagination_element = document.getElementById(
+                    "paginationSecondPage"
+                  );
+                  let mealsOutputSecondPage = document.getElementById(
+                    "mealsOutputSecondPage"
+                  );
+
+                  mealsOutputSecondPage.innerHTML = "";
+                  pagination_element.innerHTML = "";
+
+                  let parentDiv = document.createElement("div");
+                  parentDiv.classList.add("col-sm-3");
+                  parentDiv.classList.add("d-inline-block");
+                  parentDiv.classList.add("m-3");
+
+                  let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
+
+                  appendingParentDiv.innerHTML = filterBothArray;
+
+                  // mealsOutputSecondPage.innerHTML = filterBothArray;
+                }
+              }
+            }
           }
 
-          for (j = 0; j < secondData.meals.length; j++) {
-            let secondArray = secondData.meals[j].idMeal;
-            console.log(secondArray);
+          if (ifConditionArray.length == null || ifConditionArray.length == 0) {
+            let pagination_element = document.getElementById(
+              "paginationSecondPage"
+            );
+            let mealsOutputSecondPage = document.getElementById(
+              "mealsOutputSecondPage"
+            );
+            pagination_element.innerHTML = "";
+            mealsOutputSecondPage.innerHTML = `<h2 id="nothingFound">Nothing found!</h2>`;
           }
-
-          //   console.log(firstData.meals.length);
-          //   console.log(secondData);
-
-          //   var array1 = new Array("a","b","c","d","e","f");
-          //   var array2 = new Array("c","e");
-
-          //   for (var i = 0; i<array2.length; i++) {
-          //       for (var j = 0; j<array1.length; j++) {
-          //           if (array2[i] == array1[j]) {
-          //               array1 = array1.slice(0, j).concat(array1.slice(j+1, array1.length));
-          //           }
-          //       }
-          //   }
-
-          //   console.log(array1)
-
-          //   for (i = 0; i < firstData.meals.length; i++) {
-          //     console.log(firstData.meals[i].idMeal);
-
-          //     let firstArray = firstData.meals[i].idMeal;
-          //     let secondArray = secondData.meals[i].idMeal;
-
-          //     array1 = array1.filter(function(val) {
-          //         return array2.indexOf(val) == -1;
-          //       });
-
-          //     firstArray = firstArray.filter((val) => !secondArray.includes(val));
-          //     console.log(firstArray);
-          //   }
         });
     });
 }
-
-// let newContact = array1.filter((item) => item.id !== array2.id);
-
-// let myArrayTest = ['hello','goodbye','hey', 'hello'];
-
-// function hasDuplicates(array) {
-//     return (new Set(array)).size !== array.length;
-// }
-
-// console.log(hasDuplicates(myArrayTest));

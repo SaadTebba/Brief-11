@@ -118,13 +118,11 @@ function pagination(arrayHere, output) {
 
 // ==================================== Categories list ====================================
 
-let allMeals = "All meals";
-
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
   .then((response) => response.json())
   .then((data) => {
     let categorieslist = document.getElementById("categorieslist");
-    categorieslist.innerHTML += `<option>${allMeals}</option>`;
+    categorieslist.innerHTML += `<option>All Meals</option>`;
     for (i = 0; i < data.meals.length; i++) {
       if (i == 5) {
         categorieslist.innerHTML += `<option selected>${data.meals[i].strCategory}</option>`;
@@ -141,7 +139,7 @@ fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
   .then((response) => response.json())
   .then((data) => {
     let arealist = document.getElementById("arealist");
-    arealist.innerHTML += `<option>${allMeals}</option>`;
+    arealist.innerHTML += `<option>All Meals</option>`;
     for (i = 0; i < data.meals.length; i++) {
       if (i == 17) {
         arealist.innerHTML += `<option selected>${data.meals[i].strArea}</option>`;

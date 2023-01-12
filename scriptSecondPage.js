@@ -1,3 +1,6 @@
+const pagination_element = document.getElementById("paginationSecondPage");
+const mealsOutputSecondPage = document.getElementById("mealsOutputSecondPage");
+
 // ==================================== Modal window ====================================
 
 window.onclick = function moreInformation(e) {
@@ -20,7 +23,7 @@ window.onclick = function moreInformation(e) {
 
         for (i = 1; i <= 20; i++) {
           if (data.meals[0]["strIngredient" + i] !== null && data.meals[0]["strIngredient" + i] !== "" && data.meals[0]["strIngredient" + i] !== " ") {
-            
+
             modalWindow += `<li>${data.meals[0]["strIngredient" + i]}</li>`;
           }
         }
@@ -38,9 +41,6 @@ window.onclick = function moreInformation(e) {
 // ==================================== Pagination ====================================
 
 function pagination(arrayHere, output) {
-  
-  const pagination_element = document.getElementById("paginationSecondPage");
-  const mealsOutputSecondPage = document.getElementById("mealsOutputSecondPage");
 
   if (arrayHere.length > 6) {
 
@@ -104,7 +104,6 @@ function pagination(arrayHere, output) {
     SetupPagination();
 
   } else {
-    mealsOutputSecondPage.innerHTML = "";
     pagination_element.innerHTML = "";
 
     let parentDiv = document.createElement("div");
@@ -245,6 +244,8 @@ let ifConditionArray = [];
 
 function filterBoth() {
 
+  mealsOutputSecondPage.innerHTML = "";
+
   filterBothArray = [];
   ifConditionArray = [];
 
@@ -252,17 +253,13 @@ function filterBoth() {
   let j = categorieslist.selectedIndex;
   let selectedValueCategory = categorieslist.options[j].value;
 
-  let fetchCategory = fetch(
-    `https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedValueCategory}`
-  );
+  let fetchCategory = fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedValueCategory}`);
 
   let arealist = document.getElementById("arealist");
   let i = arealist.selectedIndex;
   let selectedValueArea = arealist.options[i].value;
 
-  let fetchArea = fetch(
-    `https://www.themealdb.com/api/json/v1/1/filter.php?a=${selectedValueArea}`
-  );
+  let fetchArea = fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${selectedValueArea}`);
 
   fetchCategory
     .then((response) => response.json())
@@ -290,18 +287,12 @@ function filterBoth() {
                             </div>
                         `;
                 filterBothArray.push(meals);
-                pagination(filterBothArray, filterBothArray);
+                pagination(filterBothArray, meals);
               }
             }
           }
 
           if (ifConditionArray.length == null || ifConditionArray.length == 0) {
-            let pagination_element = document.getElementById(
-              "paginationSecondPage"
-            );
-            let mealsOutputSecondPage = document.getElementById(
-              "mealsOutputSecondPage"
-            );
             pagination_element.innerHTML = "";
             mealsOutputSecondPage.innerHTML = `<h2 id="nothingFound">Nothing found!</h2>`;
           }

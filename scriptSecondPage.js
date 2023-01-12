@@ -44,7 +44,6 @@ function pagination(arrayHere, output) {
 
   if (arrayHere.length > 6) {
 
-
     let current_page = 1;
     let cards = 6;
 
@@ -119,14 +118,21 @@ function pagination(arrayHere, output) {
 
 // ==================================== Categories list ====================================
 
+let allMeals = "All meals";
+
 fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
   .then((response) => response.json())
   .then((data) => {
     let categorieslist = document.getElementById("categorieslist");
-    categorieslist.innerHTML = `<option selected hidden>${data.meals[5].strCategory}</option>`;
+    categorieslist.innerHTML += `<option>${allMeals}</option>`;
     for (i = 0; i < data.meals.length; i++) {
-      categorieslist.innerHTML += `<option>${data.meals[i].strCategory}</option>`;
+      if (i == 5) {
+        categorieslist.innerHTML += `<option selected>${data.meals[i].strCategory}</option>`;
+      } else {
+        categorieslist.innerHTML += `<option>${data.meals[i].strCategory}</option>`;
+      }
     }
+
   });
 
 // ==================================== Areas list ====================================
@@ -135,57 +141,105 @@ fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
   .then((response) => response.json())
   .then((data) => {
     let arealist = document.getElementById("arealist");
-    arealist.innerHTML = `<option selected hidden>${data.meals[17].strArea}</option>`;
+    arealist.innerHTML += `<option>${allMeals}</option>`;
     for (i = 0; i < data.meals.length; i++) {
-      arealist.innerHTML += `<option>${data.meals[i].strArea}</option> `;
+      if (i == 17) {
+        arealist.innerHTML += `<option selected>${data.meals[i].strArea}</option>`;
+      } else {
+        arealist.innerHTML += `<option>${data.meals[i].strArea}</option>`;
+      }
     }
   });
 
-// ==================================== Filter by Lamb ====================================
+// ==================================== Filter by Lamb & Morocco (first page) ====================================
 
-let filterByLambArray = [];
+let filterByLambMoroccan = [];
 
 fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Lamb`)
   .then((response) => response.json())
-  .then((data) => {
-    let meals = "";
-
-    data.meals.forEach((meal) => {
-      meals = `
-                <div class="card" data-id = "${meal.idMeal}">
-                    <div class="card-body">
-                        <h5 class="card-title">${meal.strMeal}</h5>
-                    </div>
-                    <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
-                    <div class="card-body">
-                        <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
-                    </div>
-                </div>
-            `;
-      filterByLambArray.push(meals);
-    });
-    pagination(filterByLambArray);
+  .then((dataLamb) => {
+    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=Moroccan`)
+      .then((response) => response.json())
+      .then((dataMoroccan) => {
+        for (i = 0; i < dataLamb.meals.length; i++) {
+          let firstArray = dataLamb.meals[i];
+          for (j = 0; j < dataMoroccan.meals.length; j++) {
+            let secondArray = dataMoroccan.meals[j];
+            if (firstArray.idMeal == secondArray.idMeal) {
+              ifConditionArray.push("if worked");
+              let meals = "";
+              meals = `
+                          <div class="card" data-id = "${firstArray.idMeal}">
+                              <div class="card-body">
+                                  <h5 class="card-title">${firstArray.strMeal}</h5>
+                              </div>
+                              <img class="card-img-top" src="${firstArray.strMealThumb}" alt="Recipe image">
+                              <div class="card-body">
+                                  <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                              </div>
+                          </div>
+                      `;
+              filterByLambMoroccan.push(meals);
+              pagination(filterByLambMoroccan, meals);
+            }
+          }
+        }
+      });
   });
 
 // ==================================== Filter by category ====================================
 
 let categoryPaginationArray = [];
+let listAllMealsCategories = [];
 
 function selectedOptionCategory() {
+
+  mealsOutputSecondPage.innerHTML = "";
   categoryPaginationArray = [];
+  listAllMealsCategories = [];
   let categorieslist = document.getElementById("categorieslist");
   let i = categorieslist.selectedIndex;
   let selectedValueCategory = categorieslist.options[i].value;
 
-  fetch(
-    `https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedValueCategory}`
-  )
+  fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedValueCategory}`)
     .then((response) => response.json())
     .then((data) => {
-      let meals = "";
+      if (categorieslist.selectedIndex == 0) {
+        fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
+          .then((response) => response.json())
+          .then((data) => {
+            pagination_element.innerHTML = "";
+            for (i = 0; i < data.meals.length; i++) {
 
-      data.meals.forEach((meal) => {
-        meals = `
+              fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${data.meals[i].strCategory}`)
+                .then((response) => response.json())
+                .then((data) => {
+                  let meals = "";
+
+                  data.meals.forEach((meal) => {
+                    meals = `
+                                <div class="card" data-id = "${meal.idMeal}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${meal.strMeal}</h5>
+                                    </div>
+                                    <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
+                                    <div class="card-body">
+                                        <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                                    </div>
+                                </div>
+                            `;
+                    listAllMealsCategories.push(meals);
+                  });
+                  pagination(listAllMealsCategories, meals);
+                })
+
+            }
+          })
+      } else {
+        let meals = "";
+
+        data.meals.forEach((meal) => {
+          meals = `
                         <div class="card" data-id = "${meal.idMeal}">
                             <div class="card-body">
                                 <h5 class="card-title">${meal.strMeal}</h5>
@@ -196,44 +250,80 @@ function selectedOptionCategory() {
                             </div>
                         </div>
                     `;
-        categoryPaginationArray.push(meals);
-      });
-      pagination(categoryPaginationArray, meals);
+          categoryPaginationArray.push(meals);
+        });
+        pagination(categoryPaginationArray, meals);
+      }
     });
 }
 
 // ==================================== Filter by area ====================================
 
 let areaPaginationArray = [];
+let listAllMealsAreas = [];
 
 function selectedOptionArea() {
+
+  mealsOutputSecondPage.innerHTML = "";
   areaPaginationArray = [];
+  listAllMealsAreas = [];
   let arealist = document.getElementById("arealist");
   let i = arealist.selectedIndex;
   let selectedValueArea = arealist.options[i].value;
 
-  fetch(
-    `https://www.themealdb.com/api/json/v1/1/filter.php?a=${selectedValueArea}`
-  )
+  fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${selectedValueArea}`)
     .then((response) => response.json())
     .then((data) => {
-      let meals = "";
+      if (arealist.selectedIndex == 0) {
+        fetch(`https://www.themealdb.com/api/json/v1/1/list.php?c=list`)
+          .then((response) => response.json())
+          .then((data) => {
+            pagination_element.innerHTML = "";
+            for (i = 0; i < data.meals.length; i++) {
 
-      data.meals.forEach((meal) => {
-        meals = `
-                        <div class="card" data-id = "${meal.idMeal}">
-                            <div class="card-body">
-                                <h5 class="card-title">${meal.strMeal}</h5>
-                            </div>
-                            <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
-                            <div class="card-body">
-                                <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
-                            </div>
-                        </div>
-                    `;
-        areaPaginationArray.push(meals);
-      });
-      pagination(areaPaginationArray, meals);
+              fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${data.meals[i].strCategory}`)
+                .then((response) => response.json())
+                .then((data) => {
+                  let meals = "";
+
+                  data.meals.forEach((meal) => {
+                    meals = `
+                                <div class="card" data-id = "${meal.idMeal}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${meal.strMeal}</h5>
+                                    </div>
+                                    <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
+                                    <div class="card-body">
+                                        <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                                    </div>
+                                </div>
+                            `;
+                    listAllMealsAreas.push(meals);
+                  });
+                  pagination(listAllMealsAreas, meals);
+                })
+
+            }
+          })
+      } else {
+        let meals = "";
+
+        data.meals.forEach((meal) => {
+          meals = `
+                          <div class="card" data-id = "${meal.idMeal}">
+                              <div class="card-body">
+                                  <h5 class="card-title">${meal.strMeal}</h5>
+                              </div>
+                              <img class="card-img-top" src="${meal.strMealThumb}" alt="Recipe image">
+                              <div class="card-body">
+                                  <button type="button" class="btn btn-primary more-information" data-bs-toggle="modal" data-bs-target="#exampleModal">More Information</button>
+                              </div>
+                          </div>
+                      `;
+          areaPaginationArray.push(meals);
+        });
+        pagination(areaPaginationArray, meals);
+      }
     });
 }
 

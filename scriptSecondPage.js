@@ -1,4 +1,4 @@
-// ==================================== Modal window - Onclick: more information ====================================
+// ==================================== Modal window ====================================
 
 window.onclick = function moreInformation(e) {
   if (e.target.classList.contains("more-information")) {
@@ -19,11 +19,8 @@ window.onclick = function moreInformation(e) {
                       `;
 
         for (i = 1; i <= 20; i++) {
-          if (
-            data.meals[0]["strIngredient" + i] !== null &&
-            data.meals[0]["strIngredient" + i] !== "" &&
-            data.meals[0]["strIngredient" + i] !== " "
-          ) {
+          if (data.meals[0]["strIngredient" + i] !== null && data.meals[0]["strIngredient" + i] !== "" && data.meals[0]["strIngredient" + i] !== " ") {
+            
             modalWindow += `<li>${data.meals[0]["strIngredient" + i]}</li>`;
           }
         }
@@ -37,6 +34,89 @@ window.onclick = function moreInformation(e) {
       });
   }
 };
+
+// ==================================== Pagination ====================================
+
+function pagination(arrayHere, output) {
+  
+  const pagination_element = document.getElementById("paginationSecondPage");
+  const mealsOutputSecondPage = document.getElementById("mealsOutputSecondPage");
+
+  if (arrayHere.length > 6) {
+
+
+    let current_page = 1;
+    let cards = 6;
+
+    function DisplayList(wrapper, page) {
+      wrapper.innerHTML = "";
+      page--;
+
+      let start = cards * page;
+      let end = start + cards;
+      let paginatedItems = arrayHere.slice(start, end);
+
+      for (let i = 0; i < paginatedItems.length; i++) {
+        let item = paginatedItems[i];
+
+        let item_element = document.createElement("div");
+        item_element.classList.add("item");
+        item_element.classList.add("col-sm-3");
+        item_element.classList.add("d-inline-block");
+        item_element.classList.add("m-3");
+        item_element.innerHTML = item;
+
+        wrapper.appendChild(item_element);
+      }
+    }
+
+    function SetupPagination() {
+      pagination_element.innerHTML = "";
+
+      let page_count = Math.ceil(arrayHere.length / cards);
+      for (let i = 1; i < page_count + 1; i++) {
+        let btn = PaginationButton(i, arrayHere);
+        pagination_element.appendChild(btn);
+      }
+    }
+
+    function PaginationButton(page) {
+      let button = document.createElement("button");
+      button.classList.add("btn");
+      button.classList.add("btn-outline-primary");
+      button.classList.add("pagination-buttons");
+      button.innerText = page;
+
+      if (current_page == page) button.classList.add("active");
+
+      button.addEventListener("click", function () {
+        current_page = page;
+        DisplayList(mealsOutputSecondPage, current_page);
+        let current_btn = document.querySelector("button.active");
+        current_btn.classList.remove("active");
+        button.classList.add("active");
+      });
+
+      return button;
+    }
+
+    DisplayList(mealsOutputSecondPage, current_page);
+    SetupPagination();
+
+  } else {
+    mealsOutputSecondPage.innerHTML = "";
+    pagination_element.innerHTML = "";
+
+    let parentDiv = document.createElement("div");
+    parentDiv.classList.add("col-sm-3");
+    parentDiv.classList.add("d-inline-block");
+    parentDiv.classList.add("m-3");
+
+    let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
+
+    appendingParentDiv.innerHTML = output;
+  }
+}
 
 // ==================================== Categories list ====================================
 
@@ -85,85 +165,7 @@ fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Lamb`)
             `;
       filterByLambArray.push(meals);
     });
-    if (filterByLambArray.length > 6) {
-      let list_items = filterByLambArray;
-
-      let pagination_element = document.getElementById("paginationSecondPage");
-
-      let current_page = 1;
-      let cards = 6;
-
-      function DisplayList(items, wrapper, rows_per_page, page) {
-        wrapper.innerHTML = "";
-        page--;
-
-        let start = rows_per_page * page;
-        let end = start + rows_per_page;
-        let paginatedItems = items.slice(start, end);
-
-        for (let i = 0; i < paginatedItems.length; i++) {
-          let item = paginatedItems[i];
-
-          let item_element = document.createElement("div");
-          item_element.classList.add("item");
-          item_element.classList.add("col-sm-3");
-          item_element.classList.add("d-inline-block");
-          item_element.classList.add("m-3");
-          item_element.innerHTML = item;
-
-          wrapper.appendChild(item_element);
-        }
-      }
-
-      function SetupPagination(items, wrapper, rows_per_page) {
-        wrapper.innerHTML = "";
-
-        let page_count = Math.ceil(items.length / rows_per_page);
-        for (let i = 1; i < page_count + 1; i++) {
-          let btn = PaginationButton(i, items);
-          wrapper.appendChild(btn);
-        }
-      }
-
-      function PaginationButton(page) {
-        let button = document.createElement("button");
-        button.classList.add("btn");
-        button.classList.add("btn-outline-primary");
-        button.classList.add("pagination-buttons");
-        button.innerText = page;
-
-        if (current_page == page) button.classList.add("active");
-
-        button.addEventListener("click", function () {
-          current_page = page;
-          DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-          let current_btn = document.querySelector("button.active");
-          current_btn.classList.remove("active");
-          button.classList.add("active");
-        });
-
-        return button;
-      }
-
-      DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-      SetupPagination(list_items, pagination_element, cards);
-    } else {
-      let pagination_element = document.getElementById("paginationSecondPage");
-      let mealsOutputSecondPage = document.getElementById(
-        "mealsOutputSecondPage"
-      );
-      mealsOutputSecondPage.innerHTML = "";
-      pagination_element.innerHTML = "";
-
-      let parentDiv = document.createElement("div");
-      parentDiv.classList.add("col-sm-3");
-      parentDiv.classList.add("d-inline-block");
-      parentDiv.classList.add("m-3");
-
-      let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
-
-      appendingParentDiv.innerHTML = meals;
-    }
+    pagination(filterByLambArray);
   });
 
 // ==================================== Filter by category ====================================
@@ -197,89 +199,7 @@ function selectedOptionCategory() {
                     `;
         categoryPaginationArray.push(meals);
       });
-      if (categoryPaginationArray.length > 6) {
-        let list_items = categoryPaginationArray;
-
-        let pagination_element = document.getElementById(
-          "paginationSecondPage"
-        );
-
-        let current_page = 1;
-        let cards = 6;
-
-        function DisplayList(items, wrapper, rows_per_page, page) {
-          wrapper.innerHTML = "";
-          page--;
-
-          let start = rows_per_page * page;
-          let end = start + rows_per_page;
-          let paginatedItems = items.slice(start, end);
-
-          for (let i = 0; i < paginatedItems.length; i++) {
-            let item = paginatedItems[i];
-
-            let item_element = document.createElement("div");
-            item_element.classList.add("item");
-            item_element.classList.add("col-sm-3");
-            item_element.classList.add("d-inline-block");
-            item_element.classList.add("m-3");
-            item_element.innerHTML = item;
-
-            wrapper.appendChild(item_element);
-          }
-        }
-
-        function SetupPagination(items, wrapper, rows_per_page) {
-          wrapper.innerHTML = "";
-
-          let page_count = Math.ceil(items.length / rows_per_page);
-          for (let i = 1; i < page_count + 1; i++) {
-            let btn = PaginationButton(i, items);
-            wrapper.appendChild(btn);
-          }
-        }
-
-        function PaginationButton(page) {
-          let button = document.createElement("button");
-          button.classList.add("btn");
-          button.classList.add("btn-outline-primary");
-          button.classList.add("pagination-buttons");
-          button.innerText = page;
-
-          if (current_page == page) button.classList.add("active");
-
-          button.addEventListener("click", function () {
-            current_page = page;
-            DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-            let current_btn = document.querySelector("button.active");
-            current_btn.classList.remove("active");
-            button.classList.add("active");
-          });
-
-          return button;
-        }
-
-        DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-        SetupPagination(list_items, pagination_element, cards);
-      } else {
-        let pagination_element = document.getElementById(
-          "paginationSecondPage"
-        );
-        let mealsOutputSecondPage = document.getElementById(
-          "mealsOutputSecondPage"
-        );
-        mealsOutputSecondPage.innerHTML = "";
-        pagination_element.innerHTML = "";
-
-        let parentDiv = document.createElement("div");
-        parentDiv.classList.add("col-sm-3");
-        parentDiv.classList.add("d-inline-block");
-        parentDiv.classList.add("m-3");
-
-        let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
-
-        appendingParentDiv.innerHTML = meals;
-      }
+      pagination(categoryPaginationArray, meals);
     });
 }
 
@@ -314,89 +234,7 @@ function selectedOptionArea() {
                     `;
         areaPaginationArray.push(meals);
       });
-      if (areaPaginationArray.length > 6) {
-        let list_items = areaPaginationArray;
-
-        let pagination_element = document.getElementById(
-          "paginationSecondPage"
-        );
-
-        let current_page = 1;
-        let cards = 6;
-
-        function DisplayList(items, wrapper, rows_per_page, page) {
-          wrapper.innerHTML = "";
-          page--;
-
-          let start = rows_per_page * page;
-          let end = start + rows_per_page;
-          let paginatedItems = items.slice(start, end);
-
-          for (let i = 0; i < paginatedItems.length; i++) {
-            let item = paginatedItems[i];
-
-            let item_element = document.createElement("div");
-            item_element.classList.add("item");
-            item_element.classList.add("col-sm-3");
-            item_element.classList.add("d-inline-block");
-            item_element.classList.add("m-3");
-            item_element.innerHTML = item;
-
-            wrapper.appendChild(item_element);
-          }
-        }
-
-        function SetupPagination(items, wrapper, rows_per_page) {
-          wrapper.innerHTML = "";
-
-          let page_count = Math.ceil(items.length / rows_per_page);
-          for (let i = 1; i < page_count + 1; i++) {
-            let btn = PaginationButton(i, items);
-            wrapper.appendChild(btn);
-          }
-        }
-
-        function PaginationButton(page) {
-          let button = document.createElement("button");
-          button.classList.add("btn");
-          button.classList.add("btn-outline-primary");
-          button.classList.add("pagination-buttons");
-          button.innerText = page;
-
-          if (current_page == page) button.classList.add("active");
-
-          button.addEventListener("click", function () {
-            current_page = page;
-            DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-            let current_btn = document.querySelector("button.active");
-            current_btn.classList.remove("active");
-            button.classList.add("active");
-          });
-
-          return button;
-        }
-
-        DisplayList(list_items, mealsOutputSecondPage, cards, current_page);
-        SetupPagination(list_items, pagination_element, cards);
-      } else {
-        let pagination_element = document.getElementById(
-          "paginationSecondPage"
-        );
-        let mealsOutputSecondPage = document.getElementById(
-          "mealsOutputSecondPage"
-        );
-        mealsOutputSecondPage.innerHTML = "";
-        pagination_element.innerHTML = "";
-
-        let parentDiv = document.createElement("div");
-        parentDiv.classList.add("col-sm-3");
-        parentDiv.classList.add("d-inline-block");
-        parentDiv.classList.add("m-3");
-
-        let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
-
-        appendingParentDiv.innerHTML = meals;
-      }
+      pagination(areaPaginationArray, meals);
     });
 }
 
@@ -406,7 +244,7 @@ let filterBothArray = [];
 let ifConditionArray = [];
 
 function filterBoth() {
-  
+
   filterBothArray = [];
   ifConditionArray = [];
 
@@ -436,7 +274,6 @@ function filterBoth() {
             let firstArray = firstData.meals[i];
             for (j = 0; j < secondData.meals.length; j++) {
               let secondArray = secondData.meals[j];
-
               if (firstArray.idMeal == secondArray.idMeal) {
                 ifConditionArray.push("if worked");
                 let meals = "";
@@ -453,104 +290,7 @@ function filterBoth() {
                             </div>
                         `;
                 filterBothArray.push(meals);
-
-                if (filterBothArray.length > 6) {
-
-                  let list_items = filterBothArray;
-
-                  let pagination_element = document.getElementById(
-                    "paginationSecondPage"
-                  );
-
-                  let current_page = 1;
-                  let cards = 6;
-
-                  function DisplayList(items, wrapper, rows_per_page, page) {
-                    wrapper.innerHTML = "";
-                    page--;
-
-                    let start = rows_per_page * page;
-                    let end = start + rows_per_page;
-                    let paginatedItems = items.slice(start, end);
-
-                    for (let i = 0; i < paginatedItems.length; i++) {
-                      let item = paginatedItems[i];
-
-                      let item_element = document.createElement("div");
-                      // item_element.classList.add("item");
-                      item_element.classList.add("col-sm-3");
-                      item_element.classList.add("d-inline-block");
-                      item_element.classList.add("m-3");
-                      item_element.innerHTML = item;
-
-                      wrapper.appendChild(item_element);
-                    }
-                  }
-
-                  function SetupPagination(items, wrapper, rows_per_page) {
-                    wrapper.innerHTML = "";
-
-                    let page_count = Math.ceil(items.length / rows_per_page);
-                    for (let i = 1; i < page_count + 1; i++) {
-                      let btn = PaginationButton(i, items);
-                      wrapper.appendChild(btn);
-                    }
-                  }
-
-                  function PaginationButton(page) {
-                    let button = document.createElement("button");
-                    button.classList.add("btn");
-                    button.classList.add("btn-outline-primary");
-                    button.classList.add("pagination-buttons");
-                    button.innerText = page;
-
-                    if (current_page == page) button.classList.add("active");
-
-                    button.addEventListener("click", function () {
-                      current_page = page;
-                      DisplayList(
-                        list_items,
-                        mealsOutputSecondPage,
-                        cards,
-                        current_page
-                      );
-                      let current_btn = document.querySelector("button.active");
-                      current_btn.classList.remove("active");
-                      button.classList.add("active");
-                    });
-
-                    return button;
-                  }
-
-                  DisplayList(
-                    list_items,
-                    mealsOutputSecondPage,
-                    cards,
-                    current_page
-                  );
-                  SetupPagination(list_items, pagination_element, cards);
-                } else {
-                  let pagination_element = document.getElementById(
-                    "paginationSecondPage"
-                  );
-                  let mealsOutputSecondPage = document.getElementById(
-                    "mealsOutputSecondPage"
-                  );
-
-                  mealsOutputSecondPage.innerHTML = "";
-                  pagination_element.innerHTML = "";
-
-                  let parentDiv = document.createElement("div");
-                  parentDiv.classList.add("col-sm-3");
-                  parentDiv.classList.add("d-inline-block");
-                  parentDiv.classList.add("m-3");
-
-                  let appendingParentDiv = mealsOutputSecondPage.appendChild(parentDiv);
-
-                  appendingParentDiv.innerHTML = filterBothArray;
-
-                  // mealsOutputSecondPage.innerHTML = filterBothArray;
-                }
+                pagination(filterBothArray, filterBothArray);
               }
             }
           }

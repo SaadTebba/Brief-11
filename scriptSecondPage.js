@@ -47,13 +47,13 @@ function pagination(arrayHere, output) {
     let current_page = 1;
     let cards = 6;
 
-    function DisplayList(wrapper, page) {
-      wrapper.innerHTML = "";
+    function DisplayList(output, page) {
+      output.innerHTML = "";
       page--;
 
       let start = cards * page;
       let end = start + cards;
-      let paginatedItems = arrayHere.slice(start, end);
+      let paginatedItems = arrayHere.slice(start, end); 
 
       for (let i = 0; i < paginatedItems.length; i++) {
         let item = paginatedItems[i];
@@ -65,7 +65,7 @@ function pagination(arrayHere, output) {
         item_element.classList.add("m-3");
         item_element.innerHTML = item;
 
-        wrapper.appendChild(item_element);
+        output.appendChild(item_element);
       }
     }
 
@@ -74,7 +74,7 @@ function pagination(arrayHere, output) {
 
       let page_count = Math.ceil(arrayHere.length / cards);
       for (let i = 1; i < page_count + 1; i++) {
-        let btn = PaginationButton(i, arrayHere);
+        let btn = PaginationButton(i);
         pagination_element.appendChild(btn);
       }
     }

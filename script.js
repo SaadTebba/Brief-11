@@ -106,7 +106,7 @@ function pagination(output) {
 
       let page_count = Math.ceil(searchResultPaginationArray.length / cards);
       for (let i = 1; i < page_count + 1; i++) {
-        let btn = PaginationButton(i, searchResultPaginationArray);
+        let btn = PaginationButton(i);
         pagination_element.appendChild(btn);
       }
     }

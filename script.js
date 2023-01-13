@@ -134,7 +134,6 @@ function pagination(output) {
     DisplayList(mealsOutput, current_page);
     SetupPagination();
   } else {
-    mealsOutput.innerHTML = "";
     pagination_element.innerHTML = "";
 
     let parentDiv = document.createElement("div");
@@ -151,7 +150,7 @@ function pagination(output) {
 // ==================================== Search function ====================================
 
 function getMealsList() {
-
+  mealsOutput.innerHTML = "";
   searchResultPaginationArray = [];
 
   let input = document.getElementById("searchbar").value;
@@ -159,6 +158,7 @@ function getMealsList() {
   fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${input}`)
     .then((response) => response.json())
     .then((data) => {
+      console.log(data);
       if (data.meals !== null) {
         let meals = "";
 
@@ -175,10 +175,9 @@ function getMealsList() {
                               </div>
                           `;
           searchResultPaginationArray.push(meals);
-          mealsOutput.innerHTML = meals;
           document.getElementById("searchbar").value = "";
+          pagination(meals);
         });
-        pagination(meals);
       } else {
         pagination_element.innerHTML = "";
         mealsOutput.innerHTML = `<h2 id="nothingFound">Nothing found!</h2>`;
